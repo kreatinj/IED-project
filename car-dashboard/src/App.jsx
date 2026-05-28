@@ -3,7 +3,7 @@ import mapImg from './assets/map.png';
 
 const GRID_SIZE = 4; // 교차점 개수
 const MAP_SIZE = 400; // px
-const POLL_INTERVAL = 200;
+const POLL_INTERVAL = 1000;
 
 function getCoordPos(n) {
   const s = MAP_SIZE / 16;
@@ -22,7 +22,7 @@ function App() {
   const [inputUrl, setInputUrl] = useState('http://192.168.0.112');
   const [obstacles, setObstacles] = useState([]); // {x, y}[]
   const [destination, setDestination] = useState({x: 1, y: 1}); // {x, y}
-  const [location, setLocation] = useState({x: 1, y: 1, direction: 'N'}); // {x, y, direction}
+  const [location, setLocation] = useState({position: {x: 1, y: 1}, direction: 'N'}); // {x, y, direction}
   const intervalRef = useRef();
 
   // Polling
@@ -35,8 +35,8 @@ function App() {
           fetch(`${url}/api/destination`).then(r => r.json()),
           fetch(`${url}/api/obstacles`).then(r => r.json()),
         ]);
-        setLocation(locRes);
-        setDestination(destRes);
+        setLocation(locRes.location);
+        setDestination(destRes.destination);
         setObstacles(obsRes.obstacles || []);
       } catch {
         // 네트워크 에러 무시
@@ -54,7 +54,7 @@ function App() {
       await fetch(`${url}/api/destination`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ x, y }),
+        body: JSON.stringify({ destination: { x, y } }),
       });
     } catch {
       // 무시
@@ -134,8 +134,8 @@ function App() {
                 height="30"
                 style={{
                   position: 'absolute',
-                  left: getCoordPos(location.x),
-                  top: getCoordPos(GRID_SIZE - location.y + 1),
+                  left: getCoordPos(location.position.x),
+                  top: getCoordPos(GRID_SIZE - location.position.y + 1),
                   transform: 'translate(-50%, -50%)',
                   zIndex: 30,
                   pointerEvents: 'none',

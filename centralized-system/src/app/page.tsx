@@ -17,7 +17,7 @@ export default function Home() {
   const fetchObstacles = async () => {
     const res = await fetch("/api/obstacles");
     const data = await res.json();
-    setObstacles(data.obstacles);
+    setObstacles(data || []);
   };
 
   useEffect(() => {
